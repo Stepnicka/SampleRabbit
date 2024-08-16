@@ -50,7 +50,7 @@ namespace SampleRabbit.Handlers.Order
 
         public Task Handle(PublishOrderCommand request, Exception exception, RequestExceptionHandlerState<OneOf<PublishOrderResult, IDomainError>> state, CancellationToken cancellationToken)
         {
-            logger.LogError(exception, "GetCustomerCommand {request} failed.", request);
+            logger.LogError(exception, "Command {request} failed.", request);
 
             state.SetHandled(new InternalError { Message = "Ups... something failed." });
 
