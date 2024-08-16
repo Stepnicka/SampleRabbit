@@ -1,14 +1,17 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using SampleRabbit.Service.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
+
+/* Configure logging */
+builder.Logging.ClearProviders();
 
 /* Add database */
 builder.Services.AddDbContext<SampleRabbit.DB.DataAccess.SampleDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Sample"));
 });
-
 
 /* Add masstransit */
 var rabbitMqConfiguration = builder.Configuration
@@ -25,7 +28,11 @@ builder.Services.AddMassTransit(busConfig =>
     busConfig.SetKebabCaseEndpointNameFormatter();
 
     /* Add consumers */
-    //busConfig.AddConsumer<Obect>();
+    busConfig.AddConsumer<CreateOrderConsumer>().Endpoint(endpointConfiguration =>
+    {
+        endpointConfiguration.PrefetchCount = 100;
+        endpointConfiguration.Temporary = false;
+    });
 
     busConfig.AddConfigureEndpointsCallback((context, name, cfg) =>
     {
@@ -34,25 +41,16 @@ builder.Services.AddMassTransit(busConfig =>
 
     busConfig.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(new Uri(rabbitMqConfiguration.Host), h =>
+        cfg.Host(host: rabbitMqConfiguration.Host, virtualHost: rabbitMqConfiguration.VirtualHost, h =>
         {
             h.Username(rabbitMqConfiguration.UserName);
             h.Password(rabbitMqConfiguration.Password);
         });
 
-        //cfg.ReceiveEndpoint("name", endpoint =>
-        //{
-        //    endpoint.Durable = true;
-        //    endpoint.ConsumerPriority = 10;
-        //    endpoint.PrefetchCount = 100;
-        //    endpoint.ConfigureConsumer<Object>(context);
-        //});
+        cfg.ConfigureEndpoints(context);
     });
 });
 
-
-
 var app = builder.Build();
-
 
 app.Run();

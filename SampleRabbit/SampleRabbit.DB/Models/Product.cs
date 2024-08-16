@@ -11,5 +11,7 @@ namespace SampleRabbit.DB.Models
 
         [MaxLength(200)]
         public string Name { get; set; } = null!;
+
+        public ICollection<Order> Products { get; set; } = new List<Order>();
     }
 }

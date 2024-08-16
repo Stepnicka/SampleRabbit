@@ -194,6 +194,21 @@ namespace SampleRabbit.DB.Migrations
                     b.ToTable("OutboxState");
                 });
 
+            modelBuilder.Entity("OrderProduct", b =>
+                {
+                    b.Property<int>("ProductsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductsId1")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductsId", "ProductsId1");
+
+                    b.HasIndex("ProductsId1");
+
+                    b.ToTable("OrderProduct");
+                });
+
             modelBuilder.Entity("SampleRabbit.DB.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -220,26 +235,24 @@ namespace SampleRabbit.DB.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
 
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("SampleRabbit.DB.Models.Product", b =>
+            modelBuilder.Entity("OrderProduct", b =>
                 {
                     b.HasOne("SampleRabbit.DB.Models.Order", null)
-                        .WithMany("Products")
-                        .HasForeignKey("OrderId");
-                });
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-            modelBuilder.Entity("SampleRabbit.DB.Models.Order", b =>
-                {
-                    b.Navigation("Products");
+                    b.HasOne("SampleRabbit.DB.Models.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
