@@ -34,7 +34,7 @@ namespace SampleRabbit.API.Controllers
             var handlerResult = await _mediator.Send(new Handlers.Order.PublishOrderCommand { Order = order });
 
             return handlerResult.Match(
-                    result => (IActionResult)Ok(),
+                    result => (IActionResult)Accepted(),
                     error => error switch
                     {
                         ValidationError validationError => BadRequest(SimpleError.OnValidation(validationError)),
