@@ -1,11 +1,13 @@
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Logs;
 using SampleRabbit.Service.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 /* Configure logging */
 builder.Logging.ClearProviders();
+builder.Logging.AddOpenTelemetry(configure => configure.AddConsoleExporter());
 
 /* Add database */
 builder.Services.AddDbContext<SampleRabbit.DB.DataAccess.SampleDbContext>(options =>
